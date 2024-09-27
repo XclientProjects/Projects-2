@@ -1517,6 +1517,92 @@ tab.create_dropdown({
     end
 })
 
+local _0 = false
+
+tab.create_toggle({
+    name = 'Triggerbot',
+    flag = 'triggerbot_toggle',
+    section = 'left',
+    enabled = false,
+    callback = function(_1)
+        _0 = _1
+        print("Triggerbot " .. (_1 and "On" or "Off"))
+    end
+})
+
+tab.create_dropdown({
+    name = 'Triggerbot Key',
+    flag = 'triggerbot_key',
+    section = 'left',
+    option = 'E',
+    options = {'T', 'V', 'C', 'D', 'B', 'N', 'L', 'P', 'O', 'I', 'U', 'Q'},
+    callback = function(_2)
+        local _3 = Enum.KeyCode[_2]
+
+        if _3 then
+            toggleKey = _3
+            print("Triggerbot key set to: " .. _2)
+        else
+            print("Invalid selection. Using default key (E).")
+        end
+    end
+})
+
+tab.create_dropdown({
+    name = 'Triggerbot Mode',
+    flag = 'triggerbot_mode',
+    section = 'left',
+    option = 'Hold',
+    options = {'Hold', 'Toggle'},
+    callback = function(_4)
+        _0 = (_4 == 'Toggle')
+        print("Triggerbot mode set to: " .. _4)
+    end
+})
+
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() and Players.LocalPlayer
+local mouse = lp:GetMouse()
+
+local function _5(instance)
+    for _6, _7 in ipairs(Players:GetPlayers()) do
+        if _7.Character and (instance == _7.Character or instance:IsDescendantOf(_7.Character)) then
+            return true
+        end
+    end
+end
+
+local inputService = game:GetService("UserInputService")
+local _8 = false
+
+inputService.InputBegan:Connect(function(input)
+    if input.KeyCode == toggleKey then
+        if _0 then
+            _8 = not _8
+        else
+            _8 = true
+        end
+    end
+end)
+
+inputService.InputEnded:Connect(function(input)
+    if input.KeyCode == toggleKey and not _0 then
+        _8 = false
+    end
+end)
+
+local function _9()
+    if _0 and _8 and _5(mouse.Target) then
+        mouse1press()
+        wait(0.1)
+        mouse1release()
+    end
+end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    _9()
+end)
+
 tab.create_title({
     name = 'ESP Features',
     section = 'right'
@@ -1782,8 +1868,8 @@ tab.create_slider({
     name = 'Walkspeed',
     flag = 'Walkspeed',
     section = 'right',
-    value = 0,
-    minimum_value = 0,
+    value = 20,
+    minimum_value = 16,
     maximum_value = 500,
     callback = function(s)
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
@@ -1818,7 +1904,7 @@ tab.create_dropdown({
     name = 'Collection Spoof',
     flag = 'CollectionSpoof',
     section = 'right',
-    option = '100', 
+    option = '', 
     options = {'100', '200', '1000', '2000', '5000', '10000', '20000', '50000', '100000', '200000', "2500000", "5564532"},
     callback = function(selected)
         local Players = game:GetService("Players")
@@ -1839,7 +1925,7 @@ tab.create_dropdown({
     name = 'Winstreak Spoofer',
     flag = 'WinstreakSpoofer',
     section = 'right',
-    option = '100',  
+    option = '',  
     options = {'100', '200', '1000', '2000', '5000', '10000', '20000', '50000', '100000', '200000'},
     callback = function(selected)
         local player = game:GetService("Players").LocalPlayer
