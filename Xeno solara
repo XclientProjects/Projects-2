@@ -1517,91 +1517,115 @@ tab.create_dropdown({
     end
 })
 
-local _0 = false
 
-tab.create_toggle({
-    name = 'Triggerbot',
-    flag = 'triggerbot_toggle',
-    section = 'left',
-    enabled = false,
-    callback = function(_1)
-        _0 = _1
-        print("Triggerbot " .. (_1 and "On" or "Off"))
-    end
-})
-
-tab.create_dropdown({
-    name = 'Triggerbot Key',
-    flag = 'triggerbot_key',
-    section = 'left',
-    option = 'E',
-    options = {'T', 'V', 'C', 'D', 'B', 'N', 'L', 'P', 'O', 'I', 'U', 'Q'},
-    callback = function(_2)
-        local _3 = Enum.KeyCode[_2]
-
-        if _3 then
-            toggleKey = _3
-            print("Triggerbot key set to: " .. _2)
-        else
-            print("Invalid selection. Using default key (E).")
-        end
-    end
-})
-
-tab.create_dropdown({
-    name = 'Triggerbot Mode',
-    flag = 'triggerbot_mode',
-    section = 'left',
-    option = 'Hold',
-    options = {'Hold', 'Toggle'},
-    callback = function(_4)
-        _0 = (_4 == 'Toggle')
-        print("Triggerbot mode set to: " .. _4)
-    end
-})
-
-local Players = game:GetService("Players")
-local lp = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() and Players.LocalPlayer
-local mouse = lp:GetMouse()
-
-local function _5(instance)
-    for _6, _7 in ipairs(Players:GetPlayers()) do
-        if _7.Character and (instance == _7.Character or instance:IsDescendantOf(_7.Character)) then
+local a = function() c() e() end
+local b = function(d)
+    if not d then return false end
+    for _, f in ipairs(g().Players:GetPlayers()) do
+        if f ~= g().Players.LocalPlayer and f.Character and d:IsDescendantOf(f.Character) then
             return true
         end
     end
+    return false
 end
 
-local inputService = game:GetService("UserInputService")
-local _8 = false
+local A = game:GetService("Players")
+local B = A.LocalPlayer or A:GetPropertyChangedSignal("LocalPlayer"):Wait() and A.LocalPlayer
+local C = B:GetMouse()
 
-inputService.InputBegan:Connect(function(input)
-    if input.KeyCode == toggleKey then
-        if _0 then
-            _8 = not _8
-        else
-            _8 = true
+local D = function()
+    mouse1press()
+    task.wait()
+    mouse1release()
+end
+
+local E = function(F)
+    if not F then return false end
+    for G, H in ipairs(game.Players:GetPlayers()) do
+        if H ~= game.Players.LocalPlayer and H.Character and F:IsDescendantOf(H.Character) then
+            return true
         end
     end
-end)
-
-inputService.InputEnded:Connect(function(input)
-    if input.KeyCode == toggleKey and not _0 then
-        _8 = false
-    end
-end)
-
-local function _9()
-    if _0 and _8 and _5(mouse.Target) then
-        mouse1press()
-        wait(0.1)
-        mouse1release()
-    end
+    return false
 end
 
-game:GetService("RunService").RenderStepped:Connect(function()
-    _9()
-end)
+local I = function()
+    local J = game:GetService("UserInputService")
+
+    game:GetService("RunService").Heartbeat:Connect(function()
+        local K = C.Target
+        if K and E(K) then
+            if getgenv().L then
+                if getgenv().M == "Automatic" then
+                    D()
+                elseif getgenv().M == "Hold" then
+                    if J:IsKeyDown(getgenv().N or Enum.KeyCode.F) then
+                        D()
+                    end
+                end
+            end
+        end
+    end)
+end
+
+tab.create_toggle({
+    name = 'Enable Triggerbot',
+    flag = 'L',
+    section = 'left',
+    enabled = false,
+    callback = function(O)
+        getgenv().L = O
+        if O then
+            print("Triggerbot Enabled")
+            I()
+        else
+            print("Triggerbot Disabled")
+        end
+    end
+})
+
+tab.create_dropdown({
+    name = 'Mode',
+    flag = 'M',
+    section = 'left',
+    option = 'Automatic',
+    options = {'Automatic', 'Hold'},
+    callback = function(P)
+        getgenv().M = P
+        print("Trigger Mode set to:", P)
+    end
+})
+
+tab.create_dropdown({
+    name = 'Activation Key',
+    flag = 'N',
+    section = 'left',
+    option = 'F',
+    options = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'},
+    callback = function(Q)
+        getgenv().N = Enum.KeyCode[Q]
+        print("Trigger key set to:", Q)
+    end
+})
+
+tab.create_slider({
+    name = 'Sensitivity',
+    flag = 'R',
+    section = 'left',
+    value = 2,
+    minimum_value = 0.1,
+    maximum_value = 10,
+    callback = function(S)
+        getgenv().R = S
+        print("Sensitivity set to:", S)
+    end
+})
+
+getgenv().T = function()
+    getgenv().T = nil
+    print("Triggerbot disabled.")
+    getgenv().L = false
+end
 
 tab.create_title({
     name = 'ESP Features',
